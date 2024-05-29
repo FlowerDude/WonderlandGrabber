@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 
 def load_config():
     global user_config
-    stream = open('/WonderlandGrabber/config.yaml')
+    stream = open('config.yaml')
     user_config = yaml.load(stream, Loader=yaml.FullLoader)
 
 
@@ -45,16 +45,15 @@ def getSongs(artists):
 
 
 if __name__ == '__main__':
-    # getWonderland()
     global sp
     global user_config
     load_config()
     token = util.prompt_for_user_token(
         user_config['username'], scope='playlist-modify-private,playlist-modify-public', client_id=user_config[
             'client_id'], client_secret=user_config['client_secret'], redirect_uri=user_config['redirect_uri'])
-    if token:
-        sp = spotipy.Spotify(auth=token)
-        songIds = getSongs(getWonderlandArtists())
-        sp.playlist_add_items(playlist_id=user_config['playlist_id'], items=songIds)
-    else:
+    if not token:
         print("Can't get token for", user_config['username'])
+        exit()
+    sp = spotipy.Spotify(auth=token)
+    songIds = getSongs(getWonderlandArtists())
+    sp.playlist_add_items(playlist_id=user_config['playlist_id'], items=songIds)
